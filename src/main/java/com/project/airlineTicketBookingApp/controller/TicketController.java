@@ -5,8 +5,10 @@ import com.project.airlineTicketBookingApp.model.Ticket;
 import com.project.airlineTicketBookingApp.model.TicketClass;
 import com.project.airlineTicketBookingApp.service.TicketService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,5 +48,24 @@ public class TicketController {
         return ResponseEntity.status(HttpStatus.OK).body(ticketList);
     }
 
+//    @PostMapping(path = "/tickets/book", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+//    public String bookFromForm(
+//            @RequestParam Long flightId,
+//            @RequestParam Long passengerId,
+//            @RequestParam TicketClass ticketClass,
+//            @RequestParam String seatNumber,
+//            Model model) {
+//
+//        try {
+//            TicketResponseDto created = ticketService.bookTicket(flightId, passengerId, ticketClass, seatNumber);
+//            model.addAttribute("bookingResult",
+//                    "Booking successful! Ticket ID: " + created.getId());
+//        } catch (IllegalArgumentException | IllegalStateException ex) {
+//            model.addAttribute("bookingResult", "Error: " + ex.getMessage());
+//        }
+//        // return to the same booking form so user sees the result
+//        model.addAttribute("flightId", flightId);
+//        return "booking-form";
+//    }
 
 }

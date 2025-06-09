@@ -4,9 +4,10 @@ import com.project.airlineTicketBookingApp.model.AircraftSize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Data
-@NoArgsConstructor
+@RequiredArgsConstructor
 @AllArgsConstructor
 public class AirplaneResponseDto {
 

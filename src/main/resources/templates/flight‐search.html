@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layouts/base :: section">
+<head><meta charset="UTF-8" /><title>Search Flights</title></head>
+<body>
+<section>
+    <h2>Search Direct Flights</h2>
+    <form th:action="@{/flights/search}" method="get" class="row g-3">
+        <div class="col-md-3">
+            <label for="origin" class="form-label">Origin (IATA)</label>
+            <input type="text" id="origin" name="originCode" class="form-control" required/>
+        </div>
+        <div class="col-md-3">
+            <label for="dest" class="form-label">Destination</label>
+            <input type="text" id="dest" name="destCode" class="form-control" required/>
+        </div>
+        <div class="col-md-3">
+            <label for="date" class="form-label">Date</label>
+            <input type="date" id="date" name="date" class="form-control" required/>
+        </div>
+        <div class="col-md-3 align-self-end">
+            <button type="submit" class="btn btn-primary w-100">Search</button>
+        </div>
+    </form>
+
+    <div th:if="${searchResults != null}" class="mt-4">
+        <h4>Available Flights</h4>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>ID</th><th>From</th><th>To</th><th>Dep Time</th><th>Arr Time</th><th>Seats(F/B/E)</th><th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="f : ${searchResults}">
+                <td th:text="${f.id}"></td>
+                <td th:text="${f.departureAirportCode}"></td>
+                <td th:text="${f.arrivalAirportCode}"></td>
+                <td th:text="${#dates.format(f.departureTime,'yyyy-MM-dd HH:mm')}"></td>
+                <td th:text="${#dates.format(f.arrivalTime,'yyyy-MM-dd HH:mm')}"></td>
+                <td>
+                    <span th:text="${f.totalFirstClassSeats}"></span>/
+                    <span th:text="${f.totalBusinessClassSeats}"></span>/
+                    <span th:text="${f.totalEconomyClassSeats}"></span>
+                </td>
+                <td>
+                    <a th:href="@{|/flights/book?flightId=${f.id}|}" class="btn btn-sm btn-success">Book</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

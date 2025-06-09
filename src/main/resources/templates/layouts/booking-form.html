@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layouts/base :: section">
+<head><meta charset="UTF-8" /><title>Book Flight</title></head>
+<body>
+<section>
+    <h2>Book Flight ID: <span th:text="${flightId}"></span></h2>
+    <form th:action="@{/tickets/book}" method="post" class="row g-3">
+        <input type="hidden" name="flightId" th:value="${flightId}"/>
+        <div class="col-md-4">
+            <label for="passengerId" class="form-label">Your User ID</label>
+            <input type="number" id="passengerId" name="passengerId" class="form-control" required/>
+        </div>
+        <div class="col-md-4">
+            <label for="ticketClass" class="form-label">Class</label>
+            <select id="ticketClass" name="ticketClass" class="form-select">
+                <option>FIRST</option><option>BUSINESS</option><option selected>ECONOMY</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="seatNumber" class="form-label">Seat Number</label>
+            <input type="text" id="seatNumber" name="seatNumber" class="form-control" required/>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-success">Confirm Booking</button>
+        </div>
+    </form>
+
+    <div th:if="${bookingResult}" class="alert alert-info mt-3">
+        <span th:text="${bookingResult}"></span>
+    </div>
+</section>
+</body>
+</html>
