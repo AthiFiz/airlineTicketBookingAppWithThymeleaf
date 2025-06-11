@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+
+<head>
+    <title layout:title="My Bookings">My Bookings</title>
+</head>
+
+<body>
+<section layout:fragment="content">
+    <h2>My Bookings</h2>
+    <div th:if="${bookings != null and !bookings.isEmpty()}">
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Flight ID</th>
+                <th>Route</th>
+                <th>Date</th>
+                <th>Seat Class</th>
+                <th>Passenger Name</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="b : ${bookings}">
+                <td th:text="${b.flight.id}"></td>
+                <td th:text="${b.flight.departureAirportCode + ' → ' + b.flight.arrivalAirportCode}"></td>
+                <td th:text="${#dates.format(b.flight.departureTime, 'yyyy-MM-dd HH:mm')}"></td>
+                <td th:text="${b.seatClass}"></td>
+                <td th:text="${b.passengerName}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div th:if="${bookings == null or bookings.isEmpty()}">
+        <p>You have no bookings yet.</p>
+    </div>
+</section>
+</body>
+</html>

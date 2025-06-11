@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+
+<head>
+    <title layout:title="Book Flight">Book Flight</title>
+</head>
+
+<body>
+<section layout:fragment="content">
+    <h1>Book Flight <span th:text="${flightId}"></span></h1>
+
+    <form th:action="@{/tickets/book}" method="post" class="row g-3 mb-4">
+        <input type="hidden" name="flightId" th:value="${flightId}">
+
+        <div class="col">
+            <input type="number" name="passengerId" class="form-control" placeholder="Your User ID" required>
+        </div>
+
+        <div class="col">
+            <select name="ticketClass" class="form-select" required>
+                <option value="FIRST">First</option>
+                <option value="BUSINESS">Business</option>
+                <option value="ECONOMY" selected>Economy</option>
+            </select>
+        </div>
+
+        <div class="col">
+            <input type="text" name="seatNumber" class="form-control" placeholder="Seat Number" required>
+        </div>
+
+        <div class="col-auto">
+            <button class="btn btn-success">Confirm</button>
+        </div>
+    </form>
+
+    <div th:if="${bookingResult}" class="alert alert-info">
+        <span th:text="${bookingResult}"></span>
+    </div>
+</section>
+</body>
+</html>

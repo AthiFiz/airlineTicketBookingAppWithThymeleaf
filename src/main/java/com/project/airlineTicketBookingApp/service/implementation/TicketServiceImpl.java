@@ -39,7 +39,7 @@ public class TicketServiceImpl implements TicketService {
 
         // 3) Check seat availability by class
         long alreadyBooked = ticketRepo.countByFlightIdAndTicketClass(
-                flightId, ticketClass.name());
+                flightId, ticketClass);
 
         int capacity;
 
@@ -90,6 +90,11 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public List<TicketResponseDto> getTicketsForFlight(Long flightId) {
+
+        if (flightRepo.findById(flightId).isEmpty()) {
+            throw new IllegalArgumentException("Invalid flight ID");
+        }
+
         return ticketRepo.findByFlightId(flightId)
                 .stream()
                 .map(t -> new TicketResponseDto(
@@ -106,6 +111,11 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public List<TicketResponseDto> getTicketsForPassenger(Long userId) {
+
+        if (userRepo.findById(userId).isEmpty()) {
+            throw new IllegalArgumentException("Invalid user ID");
+        }
+
         return ticketRepo.findByPassengerId(userId).stream()
                 .map(t -> new TicketResponseDto(
                         t.getId(),
