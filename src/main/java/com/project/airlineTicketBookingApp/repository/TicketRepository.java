@@ -16,4 +16,5 @@ public interface TicketRepository extends JpaRepository<Ticket, Integer> {
 
     boolean existsByFlightIdAndSeatNumber(Long flightId, String seatNumber);
 
+
 }

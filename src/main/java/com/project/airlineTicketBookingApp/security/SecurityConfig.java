@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 //                        public
                         .requestMatchers("/", "/login", "/flights/search", "/flights/search/**",
-                                "/flights/search/transit", "/css/**", "/js/**").permitAll()
+                                "/flights/search/transit", "/css/**", "/js/**", "/register/**").permitAll()
 //                        booking form (UI) requires login
                         .requestMatchers("/flights/book").authenticated()
 //                        booking action requires CUSTOMER or OPERATOR

@@ -1,7 +1,0 @@
-package com.project.airlineTicketBookingApp.service.implementation;
-
-import static org.junit.jupiter.api.Assertions.*;
-
-class TicketServiceImplTest {
-
-}
