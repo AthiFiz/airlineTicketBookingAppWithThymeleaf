@@ -4,10 +4,10 @@
 -- ('alice','password123','ROLE_CUSTOMER'),
 -- ('bob','secret!','ROLE_OPERATOR'),
 -- ('admin','admin123','ROLE_ADMIN');
-INSERT INTO users (username,password,role) VALUES
-  ('alice','{noop}password123','ROLE_CUSTOMER'),
-  ('bob','{noop}secret!','ROLE_OPERATOR'),
-  ('admin','{noop}admin123','ROLE_ADMIN');
+INSERT INTO users (username,password,role,active) VALUES
+  ('alice','{noop}password123','ROLE_CUSTOMER',TRUE),
+  ('bob','{noop}secret!','ROLE_OPERATOR',TRUE),
+  ('admin','{noop}admin123','ROLE_ADMIN',TRUE);
 
 -- Airports
 INSERT INTO airports (code,name,city,country) VALUES

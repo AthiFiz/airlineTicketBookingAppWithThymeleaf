@@ -11,5 +11,7 @@ public interface AirportService {
     AirportResponseDto createAirport(AirportRequestDto dto);
     AirportResponseDto getAirportByCode(String code);
     List<AirportResponseDto> getAllAirports();
+    void deleteByCode(String code);
+    AirportResponseDto updateAirport(AirportRequestDto dto);
 
 }

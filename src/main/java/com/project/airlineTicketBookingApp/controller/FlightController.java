@@ -2,6 +2,7 @@ package com.project.airlineTicketBookingApp.controller;
 
 import com.project.airlineTicketBookingApp.dto.FlightRequestDto;
 import com.project.airlineTicketBookingApp.dto.FlightResponseDto;
+import com.project.airlineTicketBookingApp.dto.TransitFlightOption;
 import com.project.airlineTicketBookingApp.service.FlightService;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -48,19 +49,20 @@ public class FlightController {
         return ResponseEntity.ok(results);
     }
 
-//    // Search transit itineraries
-//    @GetMapping("/search/transit")
-//    public ResponseEntity<List<TransitFlightOption>> searchTransit(
-//            @RequestParam String originCode,
-//            @RequestParam String destCode,
-//            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-//            LocalDateTime startDate,
-//            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-//            LocalDateTime endDate) {
-//        List<TransitFlightOption> results =
-//                flightService.searchTransit(originCode, destCode, startDate, endDate);
-//        return ResponseEntity.ok(results);
-//    }
+    // Search transit itineraries
+    @GetMapping("/search/transit")
+    public ResponseEntity<List<TransitFlightOption>> searchTransit(
+            @RequestParam String originCode,
+            @RequestParam String destCode,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime endDate) {
+        List<TransitFlightOption> results =
+                flightService.searchTransit(originCode, destCode, startDate, endDate);
+        return ResponseEntity.ok(results);
+    }
+
 
     // Departures report
     @GetMapping("/report/departures")

@@ -51,6 +51,26 @@ public class AirportServiceImpl implements AirportService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional
+    public void deleteByCode(String code) {
+        Airport airport = airportRepo.findByCode(code)
+                .orElseThrow(() -> new IllegalArgumentException("Airport not found: " + code));
+        airportRepo.delete(airport);
+    }
+
+    @Override
+    public AirportResponseDto updateAirport(AirportRequestDto dto) {
+        Airport airport = airportRepo.findByCode(dto.getCode())
+                .orElseThrow(() -> new IllegalArgumentException("Airport not found: " + dto.getCode()));
+
+        airport.setName(dto.getName());
+        airport.setCity(dto.getCity());
+        airport.setCountry(dto.getCountry());
+        Airport saved = airportRepo.save(airport);
+        return mapToDto(saved);
+    }
+
     private AirportResponseDto mapToDto(Airport a) {
         return new AirportResponseDto(
                 a.getId(),

@@ -1,39 +1,56 @@
+<!-- src/main/resources/templates/flight-search.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layouts/base}">
-
 <head>
     <title layout:title="Search Flights">Search Flights</title>
 </head>
 
-<body>
-<section layout:fragment="content">
+<section layout:fragment="content" sec:authorize="isAuthenticated()">
     <h2>Search Direct Flights</h2>
-    <form th:action="@{/flights/search}" method="get" class="row g-3">
+    <form th:action="@{/flights/search}" method="get" class="row g-3 mb-4">
         <div class="col-md-3">
-            <label for="origin" class="form-label">Origin (IATA)</label>
-            <input type="text" id="origin" name="originCode" class="form-control" required/>
+            <label for="origin" class="form-label">Origin</label>
+            <select id="origin" name="originCode" class="form-select" required>
+                <option value="" disabled selected>Select origin</option>
+                <option th:each="a : ${airports}"
+                        th:value="${a.code}"
+                        th:text="${a.code + ' – ' + a.city}">
+                </option>
+            </select>
         </div>
+
         <div class="col-md-3">
             <label for="dest" class="form-label">Destination</label>
-            <input type="text" id="dest" name="destCode" class="form-control" required/>
+            <select id="dest" name="destCode" class="form-select" required>
+                <option value="" disabled selected>Select destination</option>
+                <option th:each="a : ${airports}"
+                        th:value="${a.code}"
+                        th:text="${a.code + ' – ' + a.city}">
+                </option>
+            </select>
         </div>
+
         <div class="col-md-3">
             <label for="date" class="form-label">Date</label>
-            <input type="date" id="date" name="date" class="form-control" required/>
+            <input id="date" name="date" type="date"
+                   class="form-control" required/>
         </div>
+
         <div class="col-md-3 align-self-end">
-            <button type="submit" class="btn btn-primary w-100">Search</button>
+            <button class="btn btn-primary w-100">Search</button>
         </div>
     </form>
 
-    <div th:if="${searchResults != null}" class="mt-4">
+    <div th:if="${searchResults}">
         <h4>Available Flights</h4>
         <table class="table table-striped">
             <thead>
             <tr>
-                <th>ID</th><th>From</th><th>To</th><th>Dep Time</th><th>Arr Time</th><th>Seats(F/B/E)</th><th>Action</th>
+                <th>ID</th><th>From</th><th>To</th>
+                <th>Dep Time</th><th>Arr Time</th><th></th>
             </tr>
             </thead>
             <tbody>
@@ -41,20 +58,14 @@
                 <td th:text="${f.id}"></td>
                 <td th:text="${f.departureAirportCode}"></td>
                 <td th:text="${f.arrivalAirportCode}"></td>
-                <td th:text="${#dates.format(f.departureTime,'yyyy-MM-dd HH:mm')}"></td>
-                <td th:text="${#dates.format(f.arrivalTime,'yyyy-MM-dd HH:mm')}"></td>
+                <td th:text="${#temporals.format(f.departureTime,'HH:mm')}"></td>
+                <td th:text="${#temporals.format(f.arrivalTime,'HH:mm')}"></td>
                 <td>
-                    <span th:text="${f.totalFirstClassSeats}"></span>/
-                    <span th:text="${f.totalBusinessClassSeats}"></span>/
-                    <span th:text="${f.totalEconomyClassSeats}"></span>
-                </td>
-                <td>
-                    <a th:href="@{|/flights/book?flightId=${f.id}|}" class="btn btn-sm btn-success">Book</a>
+                    <a th:href="@{|/flights/book?flightId=${f.id}|}"
+                       class="btn btn-sm btn-success">Book</a>
                 </td>
             </tr>
             </tbody>
         </table>
     </div>
 </section>
-</body>
-</html>

@@ -11,7 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {~
+public class SecurityConfig {
 
     private final CustomUserDetailsService uds;
 
@@ -37,18 +37,18 @@ public class SecurityConfig {~
                         .frameOptions(frame -> frame.sameOrigin())
                 )
                 .authorizeHttpRequests(auth -> auth
-                        // H2 console
-                        .requestMatchers("/h2-console/**").permitAll()
-                        // Public pages
-                        .requestMatchers("/", "/login", "/flights/search", "/flights/search/**", "/css/**").permitAll()
-                        // Booking endpoints
-                        .requestMatchers("/tickets/book").hasAnyAuthority("ROLE_CUSTOMER","ROLE_OPERATOR")
-                        .requestMatchers("/tickets/passenger/**").hasAnyAuthority("ROLE_CUSTOMER","ROLE_OPERATOR")
-                        // Operator reports
-                        .requestMatchers("/api/flights/report/**").hasAnyAuthority("ROLE_OPERATOR","ROLE_ADMIN")
-                        // Admin only
-                        .requestMatchers("/api/users/**").hasAuthority("ROLE_ADMIN")
-                        // Everything else requires authentication
+                        // public
+                        .requestMatchers("/", "/login", "/flights/search", "/flights/search/**",
+                                "/flights/search/transit", "/css/**", "/js/**").permitAll()
+                        // booking form (UI) requires login
+                        .requestMatchers("/flights/book").authenticated()
+                        // booking action requires CUSTOMER or OPERATOR
+                        .requestMatchers("/tickets/book").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OPERATOR", "ROLE_ADMIN")
+                        // reports
+                        .requestMatchers("/reports/**").hasAnyAuthority("ROLE_OPERATOR","ROLE_ADMIN")
+                        // admin UI
+                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
+                        // any other request requires auth
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

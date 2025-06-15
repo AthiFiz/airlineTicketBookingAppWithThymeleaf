@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+<head><title layout:title="${editMode} ? 'Edit Flight' : 'New Flight'">Flight Form</title></head>
+<section layout:fragment="content" sec:authorize="hasAuthority('ROLE_ADMIN')">
+    <h2 th:text="${editMode} ? 'Edit Flight' : 'New Flight'"></h2>
+
+    <div th:if="${scheduleError}" class="alert alert-danger">
+        <span th:text="${scheduleError}"></span>
+    </div>
+
+    <form th:action="@{/admin/flights}" th:object="${flight}" method="post" class="row g-3">
+        <input type="hidden" name="editMode" th:value="${editMode}"/>
+
+        <div class="col-md-3">
+            <label class="form-label">Airplane</label>
+            <select th:field="*{airplaneId}" class="form-select">
+                <option th:each="ap : ${airplanes}"
+                        th:value="${ap.id}"
+                        th:text="${ap.tailNumber}"></option>
+            </select>
+            <div class="text-danger" th:errors="*{airplaneId}"></div>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Departure Airport</label>
+            <select th:field="*{departureAirportCode}" class="form-select">
+                <option th:each="ap : ${airports}"
+                        th:value="${ap.code}"
+                        th:text="${ap.code + ' – ' + ap.city}"></option>
+            </select>
+            <div class="text-danger" th:errors="*{departureAirportCode}"></div>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Arrival Airport</label>
+            <select th:field="*{arrivalAirportCode}" class="form-select">
+                <option th:each="ap : ${airports}"
+                        th:value="${ap.code}"
+                        th:text="${ap.code + ' – ' + ap.city}"></option>
+            </select>
+            <div class="text-danger" th:errors="*{arrivalAirportCode}"></div>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Departure Time</label>
+            <input type="datetime-local" th:field="*{departureTime}" class="form-control"/>
+            <div class="text-danger" th:errors="*{departureTime}"></div>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Arrival Time</label>
+            <input type="datetime-local" th:field="*{arrivalTime}" class="form-control"/>
+            <div class="text-danger" th:errors="*{arrivalTime}"></div>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">First Class Seats</label>
+            <input type="number" th:field="*{totalFirstClassSeats}" class="form-control"/>
+            <div class="text-danger" th:errors="*{totalFirstClassSeats}"></div>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Business Class Seats</label>
+            <input type="number" th:field="*{totalBusinessClassSeats}" class="form-control"/>
+            <div class="text-danger" th:errors="*{totalBusinessClassSeats}"></div>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Economy Seats</label>
+            <input type="number" th:field="*{totalEconomyClassSeats}" class="form-control"/>
+            <div class="text-danger" th:errors="*{totalEconomyClassSeats}"></div>
+        </div>
+
+        <div class="col-12">
+            <button class="btn btn-success" type="submit"
+                    th:text="${editMode} ? 'Update' : 'Create'"></button>
+            <a th:href="@{/admin/flights}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</section>

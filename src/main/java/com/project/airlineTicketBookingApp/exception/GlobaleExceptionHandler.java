@@ -2,6 +2,7 @@ package com.project.airlineTicketBookingApp.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -22,6 +23,12 @@ public class GlobaleExceptionHandler {
 
         return ResponseEntity.badRequest().body(errors);
     }
+
+//    @ExceptionHandler(Exception.class)
+//    public String catchAll(Exception ex, Model model) {
+//        model.addAttribute("message", ex.getMessage());
+//        return "error";
+//    }
 
 
 }

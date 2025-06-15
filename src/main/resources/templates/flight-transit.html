@@ -1,0 +1,88 @@
+<!-- src/main/resources/templates/flight-transit.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/base}">
+<head>
+  <meta charset="UTF-8">
+  <title layout:title="Transit Search">Transit Search</title>
+</head>
+<body>
+<section layout:fragment="content" sec:authorize="isAuthenticated()">
+  <h2>Search Transit Flights</h2>
+
+  <form th:action="@{/flights/search/transit}" method="get" class="row g-3 mb-4">
+    <div class="col-md-4">
+      <label for="origin" class="form-label">Origin</label>
+      <select id="origin" name="originCode" class="form-select" required>
+        <option value="" disabled selected>Select origin</option>
+        <option th:each="a : ${airports}"
+                th:value="${a.code}"
+                th:text="${a.code + ' – ' + a.city}"></option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label for="dest" class="form-label">Destination</label>
+      <select id="dest" name="destCode" class="form-select" required>
+        <option value="" disabled selected>Select destination</option>
+        <option th:each="a : ${airports}"
+                th:value="${a.code}"
+                th:text="${a.code + ' – ' + a.city}"></option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label for="date" class="form-label">Date</label>
+      <input id="date" name="date" type="date" class="form-control" required/>
+    </div>
+    <div class="col-md-1 align-self-end">
+      <button class="btn btn-primary w-100">Search</button>
+    </div>
+  </form>
+
+  <div th:if="${transitResults}">
+    <h4>Connecting Options</h4>
+    <table class="table table-bordered">
+      <thead>
+      <tr>
+        <th>Leg 1</th>
+        <th>Leg 2</th>
+        <th>Connect Time</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="opt : ${transitResults}">
+        <td>
+          <strong th:text="${opt.firstLeg.departureAirportCode}"></strong>
+          →
+          <strong th:text="${opt.firstLeg.arrivalAirportCode}"></strong><br/>
+          <small th:text="${#dates.format(opt.firstLeg.departureTime,'HH:mm')}
+                              + ' – ' +
+                              #dates.format(opt.firstLeg.arrivalTime,'HH:mm')}"></small>
+        </td>
+        <td>
+          <strong th:text="${opt.secondLeg.departureAirportCode}"></strong>
+          →
+          <strong th:text="${opt.secondLeg.arrivalAirportCode}"></strong><br/>
+          <small th:text="${#dates.format(opt.secondLeg.departureTime,'HH:mm')}
+                              + ' – ' +
+                              #dates.format(opt.secondLeg.arrivalTime,'HH:mm')}"></small>
+        </td>
+        <td>
+              <span th:text="${opt.layoverMinutes / 60} + 'h '
+                              + (opt.layoverMinutes % 60) + 'm'"></span>
+        </td>
+        <td>
+          <a th:href="@{|/flights/book?flightId=${opt.firstLeg.id}|}"
+             class="btn btn-sm btn-success mb-1">Book Leg 1</a><br/>
+          <a th:href="@{|/flights/book?flightId=${opt.secondLeg.id}|}"
+             class="btn btn-sm btn-success">Book Leg 2</a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+</body>
+</html>

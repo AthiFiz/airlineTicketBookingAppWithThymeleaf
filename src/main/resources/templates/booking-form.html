@@ -1,43 +1,69 @@
+<!-- src/main/resources/templates/booking-form.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security"
       layout:decorate="~{layouts/base}">
-
 <head>
+    <meta charset="UTF-8">
     <title layout:title="Book Flight">Book Flight</title>
 </head>
 
-<body>
-<section layout:fragment="content">
-    <h1>Book Flight <span th:text="${flightId}"></span></h1>
+<section layout:fragment="content" sec:authorize="isAuthenticated()">
+    <h2>Book Flight <span th:text="${flightId}"></span></h2>
 
-    <form th:action="@{/tickets/book}" method="post" class="row g-3 mb-4">
-        <input type="hidden" name="flightId" th:value="${flightId}">
+    <!-- booking errors -->
+    <div th:if="${bookingError}" class="alert alert-danger">
+        <span th:text="${bookingError}"></span>
+    </div>
 
-        <div class="col">
-            <input type="number" name="passengerId" class="form-control" placeholder="Your User ID" required>
-        </div>
+    <form th:action="@{/tickets/book}" method="post" class="row g-3">
+        <input type="hidden"
+               th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}"/>
+        <input type="hidden" name="flightId" th:value="${flightId}"/>
 
-        <div class="col">
-            <select name="ticketClass" class="form-select" required>
-                <option value="FIRST">First</option>
-                <option value="BUSINESS">Business</option>
-                <option value="ECONOMY" selected>Economy</option>
+        <div class="col-md-4" sec:authorize="hasAnyAuthority('ROLE_OPERATOR', 'ROLE_ADMIN')">
+            <label class="form-label">Passenger</label>
+            <select name="passengerId" class="form-select" required>
+                <option value="" disabled selected>Select customer</option>
+                <option th:each="u : ${allCustomers}"
+                        th:value="${u.id}"
+                        th:text="${u.username}"></option>
             </select>
         </div>
 
-        <div class="col">
-            <input type="text" name="seatNumber" class="form-control" placeholder="Seat Number" required>
+        <div class="col-md-4">
+            <label for="ticketClass" class="form-label">Class</label>
+            <select id="ticketClass" name="ticketClass"
+                    class="form-select" required>
+                <option value="FIRST">First Class</option>
+                <option value="BUSINESS">Business Class</option>
+                <option value="ECONOMY" selected>Economy Class</option>
+            </select>
         </div>
 
-        <div class="col-auto">
-            <button class="btn btn-success">Confirm</button>
+        <div class="col-md-4">
+            <label for="seatNumber" class="form-label">Seat Number</label>
+            <input id="seatNumber" name="seatNumber" type="text"
+                   class="form-control" placeholder="e.g. 12A" required/>
+        </div>
+
+        <div class="col-12">
+            <button type="submit" class="btn btn-success">Confirm Booking</button>
+            <a th:href="@{/flights/search}" class="btn btn-secondary ms-2">Cancel</a>
         </div>
     </form>
 
-    <div th:if="${bookingResult}" class="alert alert-info">
-        <span th:text="${bookingResult}"></span>
+    <!-- success -->
+    <div th:if="${ticket}" class="alert alert-success mt-4">
+        <h4>✅ Booking Confirmed</h4>
+        <ul class="list-unstyled mb-0">
+            <li><strong>Ticket ID:</strong> <span th:text="${ticket.id}"/></li>
+            <li><strong>Passenger:</strong> <span th:text="${ticket.passengerUsername}"/></li>
+            <li><strong>Class:</strong> <span th:text="${ticket.ticketClass}"/></li>
+            <li><strong>Seat:</strong> <span th:text="${ticket.seatNumber}"/></li>
+        </ul>
     </div>
 </section>
-</body>
 </html>

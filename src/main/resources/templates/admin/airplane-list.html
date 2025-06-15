@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+<head><title layout:title="Manage Airplanes">Manage Airplanes</title></head>
+<section layout:fragment="content" sec:authorize="hasAuthority('ROLE_ADMIN')">
+    <h2>Airplanes</h2>
+    <a th:href="@{/admin/airplanes/new}" class="btn btn-primary mb-3">+ New Airplane</a>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th><th>Tail #</th><th>Size</th><th>Model</th><th>Home Airport</th><th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="a : ${airplanes}">
+            <td th:text="${a.id}"></td>
+            <td th:text="${a.tailNumber}"></td>
+            <td th:text="${a.size}"></td>
+            <td th:text="${a.model}"></td>
+            <td th:text="${a.homeAirportCode}"></td>
+            <td>
+                <a th:href="@{/admin/airplanes/edit/{id}(id=${a.id})}"
+                   class="btn btn-sm btn-secondary">Edit</a>
+
+                <form th:action="@{/admin/airplanes/delete/{id}(id=${a.id})}"
+                      method="post"
+                      class="d-inline"
+                      onsubmit="return confirm('Are you sure you want to delete this airplane?');">
+                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</section>

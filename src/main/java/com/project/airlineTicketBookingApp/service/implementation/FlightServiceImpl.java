@@ -2,6 +2,7 @@ package com.project.airlineTicketBookingApp.service.implementation;
 
 import com.project.airlineTicketBookingApp.dto.FlightRequestDto;
 import com.project.airlineTicketBookingApp.dto.FlightResponseDto;
+import com.project.airlineTicketBookingApp.dto.TransitFlightOption;
 import com.project.airlineTicketBookingApp.model.Airplane;
 import com.project.airlineTicketBookingApp.model.Airport;
 import com.project.airlineTicketBookingApp.model.Flight;
@@ -12,7 +13,9 @@ import com.project.airlineTicketBookingApp.service.FlightService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -90,51 +93,87 @@ public class FlightServiceImpl implements FlightService {
     }
 
 
-//    @Override
-//    public List<TransitFlightOption> searchTransit(String originCode, String destCode,
-//                                                   LocalDateTime startDate, LocalDateTime endDate) {
-//        // Re-use existing logic, but you can choose whether to wrap f1/f2 in DTOs too.
-//        // For brevity, we leave TransitFlightOption containing full Flight entities.
-//        return flightRepo.findByDepartureAirport_CodeAndDepartureTimeBetween(
-//                        originCode.toUpperCase(), startDate, endDate
-//                )
-//                .stream()
-//                .flatMap(f1 -> {
-//                    String inter = f1.getArrivalAirport().getCode();
-//                    LocalDateTime earliest = f1.getArrivalTime().plusHours(1);
-//                    LocalDateTime latest   = f1.getArrivalTime().plusHours(6);
-//
-//                    List<Flight> seconds = flightRepo
-//                            .findByDepartureAirport_CodeAndArrivalAirport_CodeAndDepartureTimeBetween(
-//                                    inter, destCode.toUpperCase(), earliest, latest);
-//
-//                    return seconds.stream()
-//                            .map(f2 -> new TransitFlightOption(f1, f2));
-//                })
-//                .collect(Collectors.toList());
-//    }
+    @Override
+    public List<TransitFlightOption> searchTransit(String originCode,
+                                                   String destCode,
+                                                   LocalDateTime start,
+                                                   LocalDateTime end) {
+        // fetch all possible first legs
+        List<FlightResponseDto> firstLegs =
+                searchDirect(originCode, null, start, end);
+
+        // fetch all possible second legs
+        List<FlightResponseDto> secondLegs =
+                searchDirect(null, destCode, start, end);
+
+        long minLayover = Duration.ofHours(1).toMinutes();   // ≥1h
+        long maxLayover = Duration.ofHours(6).toMinutes();   // ≤6h
+
+        List<TransitFlightOption> results = new ArrayList<>();
+        for (FlightResponseDto f1 : firstLegs) {
+            for (FlightResponseDto f2 : secondLegs) {
+                // must connect at same airport
+                if (!f1.getArrivalAirportCode().equals(f2.getDepartureAirportCode())) {
+                    continue;
+                }
+                // compute layover
+                long layover = Duration.between(
+                                f1.getArrivalTime(),
+                                f2.getDepartureTime())
+                        .toMinutes();
+                if (layover < minLayover || layover > maxLayover) {
+                    continue;
+                }
+                results.add(new TransitFlightOption(f1, f2, layover));
+            }
+        }
+        return results;
+    }
 
 
     @Override
-    public List<FlightResponseDto> getDepartures(String airportCode, LocalDateTime startDate, LocalDateTime endDate) {
-        return flightRepo.findDepartures(airportCode.toUpperCase(), startDate, endDate)
-                .stream()
+    @Transactional
+    public List<FlightResponseDto> getDepartures(String airportCode,
+                                                 LocalDateTime start,
+                                                 LocalDateTime end) {
+        return flightRepo.findByDepartureAirport_CodeAndDepartureTimeBetween(
+                        airportCode, start, end
+                ).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<FlightResponseDto> getArrivals(String airportCode, LocalDateTime startDate, LocalDateTime endDate) {
-        return flightRepo.findArrivals(airportCode.toUpperCase(), startDate, endDate)
-                .stream()
+    @Transactional
+    public List<FlightResponseDto> getArrivals(String airportCode,
+                                               LocalDateTime start,
+                                               LocalDateTime end) {
+        return flightRepo.findByArrivalAirport_CodeAndArrivalTimeBetween(
+                        airportCode, start, end
+                ).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
+    @Override
+    @Transactional
+    public void deleteById(Long id) {
+        Flight f = flightRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid flight ID: " + id));
+        flightRepo.delete(f);
+    }
 
-    // Helper to convert Flight entity → FlightResponseDto
-    private FlightResponseDto mapToDto(Flight f) {
+    @Override
+    @Transactional
+    public FlightResponseDto getFlightById(Long id) {
+        Flight f = flightRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Flight not found: " + id));
+        return mapToDto(f);
+    }
+
+    public FlightResponseDto mapToDto(Flight f) {
         return new FlightResponseDto(
                 f.getId(),
+                f.getAirplane().getId(),
                 f.getAirplane().getTailNumber(),
                 f.getDepartureAirport().getCode(),
                 f.getArrivalAirport().getCode(),

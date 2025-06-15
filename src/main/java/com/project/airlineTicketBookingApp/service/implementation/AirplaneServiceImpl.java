@@ -4,6 +4,7 @@ import com.project.airlineTicketBookingApp.dto.AirplaneRequestDto;
 import com.project.airlineTicketBookingApp.dto.AirplaneResponseDto;
 import com.project.airlineTicketBookingApp.model.Airplane;
 import com.project.airlineTicketBookingApp.model.Airport;
+import com.project.airlineTicketBookingApp.model.User;
 import com.project.airlineTicketBookingApp.repository.AirplaneRepository;
 import com.project.airlineTicketBookingApp.repository.AirportRepository;
 import com.project.airlineTicketBookingApp.service.AirplaneService;
@@ -58,6 +59,25 @@ public class AirplaneServiceImpl implements AirplaneService {
         return airplaneRepo.findAll().stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(Long id) {
+        Airplane a = airplaneRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Airplane not found: " + id));
+        airplaneRepo.delete(a);
+    }
+
+    @Override
+    public void updateAirplane(Long id, AirplaneRequestDto dto) {
+        Airplane airplane = airplaneRepo.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Airplane not found: ID " + id));
+
+        airplane.setModel(dto.getModel());
+        airplane.setSize(dto.getSize());
+        airplaneRepo.save(airplane);
+
     }
 
     private AirplaneResponseDto mapToDto(Airplane a) {

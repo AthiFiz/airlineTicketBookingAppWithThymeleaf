@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+<head>
+    <meta charset="UTF-8">
+    <title layout:title="Manage Airports">Manage Airports</title>
+</head>
+
+<section layout:fragment="content">
+    <h2>Airports</h2>
+    <a th:href="@{/admin/airports/new}" class="btn btn-primary mb-3">+ New Airport</a>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Code</th>
+            <th>Name</th>
+            <th>City</th>
+            <th>Country</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="a : ${airports}">
+            <td th:text="${a.code}"></td>
+            <td th:text="${a.name}"></td>
+            <td th:text="${a.city}"></td>
+            <td th:text="${a.country}"></td>
+            <td>
+                <a th:href="@{/admin/airports/edit/{code}(code=${a.code})}"
+                   class="btn btn-sm btn-secondary">Edit</a>
+                <a th:href="@{/admin/airports/delete/{code}(code=${a.code})}"
+                   class="btn btn-sm btn-danger"
+                   onclick="return confirm('Delete airport ' + /*[[${a.code}]]*/ '' + '?');">
+                    Delete
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</section>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+<head><title layout:title="Manage Flights">Manage Flights</title></head>
+<section layout:fragment="content" sec:authorize="hasAuthority('ROLE_ADMIN')">
+    <h2>Flights</h2>
+    <a th:href="@{/admin/flights/new}" class="btn btn-primary mb-3">+ New Flight</a>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th><th>Plane</th><th>From</th><th>To</th>
+            <th>Dep</th><th>Arr</th><th>Seats(F/B/E)</th><th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="f : ${flights}">
+            <td th:text="${f.id}"></td>
+            <td th:text="${f.airplaneTailNumber}"></td>
+            <td th:text="${f.departureAirportCode}"></td>
+            <td th:text="${f.arrivalAirportCode}"></td>
+<!--            <td th:text="${#dates.format(f.departureTime,'yyyy-MM-dd HH:mm')}"></td>-->
+<!--            <td th:text="${#dates.format(f.arrivalTime,'yyyy-MM-dd HH:mm')}"></td>-->
+            <td th:text="${#temporals.format(f.departureTime,'HH:mm')}"></td>
+            <td th:text="${#temporals.format(f.arrivalTime,'HH:mm')}"></td>
+            <td>
+                <span th:text="${f.totalFirstClassSeats}"></span>/
+                <span th:text="${f.totalBusinessClassSeats}"></span>/
+                <span th:text="${f.totalEconomyClassSeats}"></span>
+            </td>
+            <td>
+                <a th:href="@{/admin/flights/edit/{id}(id=${f.id})}" class="btn btn-sm btn-secondary">Edit</a>
+                <a th:href="@{/admin/flights/delete/{id}(id=${f.id})}" class="btn btn-sm btn-danger"
+                   onclick="return confirm('Delete flight?');">Delete</a>
+                <a th:href="@{/admin/flights/{id}/manifest(id=${f.id})}"
+                     +    class="btn btn-sm btn-info">Manifest</a>
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+</section>

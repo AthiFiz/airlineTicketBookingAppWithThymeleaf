@@ -12,6 +12,7 @@ public interface TicketService {
                                  TicketClass ticketClass, String seatNumber);
     List<TicketResponseDto> getTicketsForFlight(Long flightId);
     List<TicketResponseDto> getTicketsForPassenger(Long passengerId);
+    void cancelTicket(Integer ticketId);
 
 
 }

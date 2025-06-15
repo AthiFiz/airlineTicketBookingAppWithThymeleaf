@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/base}">
+<head>
+    <meta charset="UTF-8">
+    <title layout:title="Flight Manifest">Flight Manifest</title>
+</head>
+
+<section layout:fragment="content"
+         sec:authorize="hasAnyAuthority('ROLE_OPERATOR','ROLE_ADMIN')">
+    <h2>Passenger Manifest for Flight <span th:text="${flightId}"></span></h2>
+
+    <table class="table table-striped" th:if="${tickets}">
+        <thead>
+        <tr>
+            <th>Ticket ID</th>
+            <th>Passenger ID</th>
+            <th>Class</th>
+            <th>Seat</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="t : ${tickets}">
+            <td th:text="${t.id}"></td>
+            <td th:text="${t.passengerId}"></td>
+            <td th:text="${t.ticketClass}"></td>
+            <td th:text="${t.seatNumber}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div th:if="${#lists.isEmpty(tickets)}" class="alert alert-info">
+        No bookings found for this flight.
+    </div>
+</section>

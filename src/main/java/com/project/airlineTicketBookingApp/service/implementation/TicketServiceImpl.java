@@ -129,4 +129,13 @@ public class TicketServiceImpl implements TicketService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional
+    public void cancelTicket(Integer ticketId) {
+        Ticket ticket = ticketRepo.findById(ticketId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Ticket not found: " + ticketId));
+        ticketRepo.delete(ticket);
+    }
+
 }

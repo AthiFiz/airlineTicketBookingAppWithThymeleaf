@@ -13,6 +13,7 @@ public class UserResponseDto {
     private Long id;
     private String username;
     private Role role;
+    private boolean active;
 
 
 

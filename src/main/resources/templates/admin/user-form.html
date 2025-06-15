@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base}">
+<head>
+    <meta charset="UTF-8">
+    <title layout:title="${editMode} ? 'Edit User' : 'New User'">
+        User Form
+    </title>
+</head>
+
+<section layout:fragment="content">
+    <h2 th:text="${editMode} ? 'Edit User' : 'New User'"></h2>
+
+    <form th:action="${editMode} ? @{/admin/users/{id}(id=${userId})} : @{/admin/users}"
+          th:object="${userRequestDto}"
+          method="post"
+          class="row g-3">
+
+        <input type="hidden" name="editMode" th:value="${editMode}" />
+
+        <!-- Hidden ID for edit -->
+        <input type="hidden" name="id" th:value="${userId}" th:if="${editMode}" />
+
+        <div class="col-md-4">
+            <label for="username" class="form-label">Username</label>
+            <input id="username"
+                   type="text"
+                   th:field="*{username}"
+                   class="form-control" />
+            <div class="text-danger" th:errors="*{username}"></div>
+        </div>
+
+        <div class="col-md-4">
+            <label for="password" class="form-label"
+                   th:text="${editMode} ? 'New Password' : 'Password'">
+            </label>
+            <input id="password"
+                   type="password"
+                   th:field="*{password}"
+                   class="form-control"
+                   th:placeholder="${editMode} ? 'Leave blank to keep current' : ''" />
+            <div class="text-danger" th:errors="*{password}"></div>
+        </div>
+
+        <div class="col-md-4">
+            <label for="role" class="form-label">Role</label>
+            <select id="role"
+                    th:field="*{role}"
+                    class="form-select">
+                <option th:value="${T(com.project.airlineTicketBookingApp.model.Role).ROLE_CUSTOMER}">
+                    ROLE_CUSTOMER
+                </option>
+                <option th:value="${T(com.project.airlineTicketBookingApp.model.Role).ROLE_OPERATOR}">
+                    ROLE_OPERATOR
+                </option>
+                <option th:value="${T(com.project.airlineTicketBookingApp.model.Role).ROLE_ADMIN}">
+                    ROLE_ADMIN
+                </option>
+            </select>
+            <div class="text-danger" th:errors="*{role}"></div>
+        </div>
+
+        <div class="col-12">
+            <button type="submit"
+                    class="btn btn-success"
+                    th:text="${editMode} ? 'Update' : 'Create'">
+                Submit
+            </button>
+            <a th:href="@{/admin/users}" class="btn btn-secondary ms-2">Cancel</a>
+        </div>
+    </form>
+</section>
+</html>

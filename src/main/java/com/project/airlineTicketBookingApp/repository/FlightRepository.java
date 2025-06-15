@@ -53,7 +53,24 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate")   LocalDateTime endDate);
 
-    // add queries for transit/connecting flights
+//    For transit flights
+
+//    Find all flights departing a given airport between startDate and endDate
+    List<Flight> findByDepartureAirport_CodeAndDepartureTimeBetween(
+            String departureAirportCode,
+            LocalDateTime startDate,
+            LocalDateTime endDate);
+
+//    // Find all flights departing from a specific airport code → arriving at destCode
+//    // whose departureTime is between startDate2 and endDate2
+//    List<Flight> findByDepartureAirport_CodeAndArrivalAirport_CodeAndDepartureTimeBetween(
+//            String depCode,
+//            String arrCode,
+//            LocalDateTime startDate2,
+//            LocalDateTime endDate2);
+
+    List<Flight> findByArrivalAirport_CodeAndArrivalTimeBetween(
+            String code, LocalDateTime start, LocalDateTime end);
 
 
 }

@@ -1,0 +1,96 @@
+<!-- src/main/resources/templates/flight-reports.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security"
+      layout:decorate="~{layouts/base}">
+<head>
+  <meta charset="UTF-8">
+  <title layout:title="Flight Reports">Flight Reports</title>
+  <!-- Hide nav/buttons when printing -->
+  <style>
+    @media print {
+      nav, form, .btn-print, .btn, .dropdown { display: none !important; }
+      .container { margin-top: 0; }
+    }
+  </style>
+</head>
+
+<section layout:fragment="content" sec:authorize="hasAnyAuthority('ROLE_OPERATOR','ROLE_ADMIN')">
+  <h2>Arrivals & Departures Report</h2>
+
+  <form th:action="@{/reports}" method="get" class="row g-3 mb-4">
+    <div class="col-md-4">
+      <label class="form-label">Airport</label>
+      <select name="airportCode" class="form-select" required>
+        <option value="" disabled
+                th:if="${selectedAirport == null}"
+                selected>Select airport</option>
+        <option th:each="a : ${airports}"
+                th:value="${a.code}"
+                th:text="${a.code + ' – ' + a.city}"
+                th:selected="${a.code == selectedAirport}">
+        </option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">From</label>
+      <input name="startDate" type="date" class="form-control"
+             th:value="${startDate}" required/>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">To</label>
+      <input name="endDate" type="date" class="form-control"
+             th:value="${endDate}" required/>
+    </div>
+    <div class="col-md-2 align-self-end">
+      <button class="btn btn-primary w-100">Show</button>
+    </div>
+  </form>
+  <div class="d-flex mb-3">
+    <button class="btn btn-outline-secondary btn-print me-auto"
+            onclick="window.print()">
+      🖨️ Print PDF
+    </button>
+  </div>
+
+
+  <div th:if="${departures}">
+    <h4>Departures</h4>
+    <table class="table table-striped mb-4">
+      <thead>
+      <tr>
+        <th>Flight ID</th><th>To</th><th>Dep Time</th><th>Plane</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="f : ${departures}">
+        <td th:text="${f.id}"></td>
+        <td th:text="${f.arrivalAirportCode}"></td>
+        <td th:text="${#temporals.format(f.departureTime,'yyyy-MM-dd HH:mm')}"></td>
+        <td th:text="${f.airplaneTailNumber}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div th:if="${arrivals}">
+    <h4>Arrivals</h4>
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th>Flight ID</th><th>From</th><th>Arr Time</th><th>Plane</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="f : ${arrivals}">
+        <td th:text="${f.id}"></td>
+        <td th:text="${f.departureAirportCode}"></td>
+        <td th:text="${#temporals.format(f.arrivalTime,'yyyy-MM-dd HH:mm')}"></td>
+        <td th:text="${f.airplaneTailNumber}"></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+</section>
