@@ -29,7 +29,6 @@ public class ReportsController {
         this.flightService  = flightService;
     }
 
-    /** Show the form */
     @GetMapping
     public String showReportForm(Model model) {
         List<AirportResponseDto> airports = airportService.getAllAirports();
@@ -37,7 +36,6 @@ public class ReportsController {
         return "flight-reports";
     }
 
-    /** Handle submission */
     @GetMapping(params = {"airportCode","startDate","endDate"})
     public String handleReport(
         @RequestParam String airportCode,
@@ -47,7 +45,6 @@ public class ReportsController {
             LocalDate endDate,
         Model model) {
 
-        // keep airports dropdown
         model.addAttribute("airports", airportService.getAllAirports());
         model.addAttribute("selectedAirport", airportCode);
         model.addAttribute("startDate", startDate);

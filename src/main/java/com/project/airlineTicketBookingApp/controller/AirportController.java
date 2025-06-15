@@ -19,7 +19,7 @@ public class AirportController {
         this.airportService = airportService;
     }
 
-    /** Create a new airport */
+
     @PostMapping
     public ResponseEntity<AirportResponseDto> createAirport(
             @RequestBody @Valid AirportRequestDto dto) {
@@ -27,14 +27,12 @@ public class AirportController {
         return ResponseEntity.ok(created);
     }
 
-    /** List all airports */
     @GetMapping
     public ResponseEntity<List<AirportResponseDto>> getAllAirports() {
         List<AirportResponseDto> all = airportService.getAllAirports();
         return ResponseEntity.ok(all);
     }
 
-    /** Get one airport by its IATA code */
     @GetMapping("/code/{code}")
     public ResponseEntity<AirportResponseDto> getByCode(@PathVariable String code) {
         AirportResponseDto airport = airportService.getAirportByCode(code);

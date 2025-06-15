@@ -24,11 +24,12 @@ public class GlobaleExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
-//    @ExceptionHandler(Exception.class)
-//    public String catchAll(Exception ex, Model model) {
-//        model.addAttribute("message", ex.getMessage());
-//        return "error";
-//    }
+//    Catches the error and place it in error.html
+    @ExceptionHandler(Exception.class)
+    public String catchAll(Exception ex, Model model) {
+        model.addAttribute("message", ex.getMessage());
+        return "error";
+    }
 
 
 }

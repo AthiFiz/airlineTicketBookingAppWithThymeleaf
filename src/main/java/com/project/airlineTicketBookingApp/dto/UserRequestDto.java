@@ -16,7 +16,8 @@ public class UserRequestDto {
     @NotBlank @Size(min = 6)
     private String password;
 
+//    ROLE_CUSTOMER, ROLE_OPERATOR, ROLE_ADMIN
     @NotNull
-    private Role role; // ROLE_CUSTOMER, ROLE_OPERATOR, ROLE_ADMIN
+    private Role role;
 
 }

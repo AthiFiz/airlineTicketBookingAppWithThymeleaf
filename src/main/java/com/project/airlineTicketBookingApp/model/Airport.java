@@ -16,7 +16,7 @@ public class Airport {
     private Long id;
 
     @Column(nullable = false, unique = true, length = 3)
-    private String code; // IATA code, e.g., "CMB", "JFK"
+    private String code;
 
     @Column(nullable = false)
     private String name;

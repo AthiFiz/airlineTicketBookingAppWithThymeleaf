@@ -24,12 +24,9 @@ public class FlightRequestDto {
     @NotNull
     private LocalDateTime arrivalTime;
 
-//    @Min(0)
     private int totalFirstClassSeats;
 
-//    @Min(0)
     private int totalBusinessClassSeats;
 
-//    @Min(0)
     private int totalEconomyClassSeats;
 }

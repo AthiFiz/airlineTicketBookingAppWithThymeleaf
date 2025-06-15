@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head><title>Error</title></head>
+  <body class="container mt-4">
+    <h1>Oops, something went wrong</h1>
+      <p th:text="${message}">Error details...</p>
+      <a th:href="@{/static}" class="btn btn-primary mt-3">Go Home</a>
+  </body>
+</html>

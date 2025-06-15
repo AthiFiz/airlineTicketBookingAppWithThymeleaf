@@ -49,7 +49,7 @@ public class FlightController {
         return ResponseEntity.ok(results);
     }
 
-    // Search transit itineraries
+    // Search transit flights
     @GetMapping("/search/transit")
     public ResponseEntity<List<TransitFlightOption>> searchTransit(
             @RequestParam String originCode,

@@ -6,6 +6,7 @@ import com.project.airlineTicketBookingApp.model.TicketClass;
 import com.project.airlineTicketBookingApp.service.TicketService;
 import com.project.airlineTicketBookingApp.service.UserService;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/tickets")
@@ -37,16 +39,12 @@ public class TicketWebController {
             @RequestParam String seatNumber,
             Model model) {
 
-        // Always re-show the flightId (so the form still renders after an error)
         model.addAttribute("flightId", flightId);
 
-        // Determine if the current user can book for others (is an OPERATOR or ADMIN)
         var authorities = userDetails.getAuthorities();
         boolean canBookForOthers = authorities.contains(new SimpleGrantedAuthority("ROLE_OPERATOR")) ||
                 authorities.contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
 
-        // If the user can't book for others, or if they can but didn't select a passenger,
-        // then book the ticket for the currently logged-in user.
         if (!canBookForOthers || passengerId == null) {
             UserResponseDto userResponseDto = userService.getUserByUsername(userDetails.getUsername());
             passengerId = userResponseDto.getId();
@@ -58,11 +56,9 @@ public class TicketWebController {
             );
             model.addAttribute("ticket", ticket);
         } catch (IllegalStateException ex) {
-            // Seat already taken (or other business-rule violation)
             model.addAttribute("bookingError", ex.getMessage());
         }
 
-        // If operator, re-populate the customer dropdown
         if (canBookForOthers) {
             model.addAttribute("allCustomers", userService.getAllUsers());
         }
@@ -70,12 +66,73 @@ public class TicketWebController {
         return "booking-form";
     }
 
-    /**
-     * Cancel a ticket and redirect back to the bookings page.
-     */
+    @Secured({ "ROLE_CUSTOMER", "ROLE_OPERATOR", "ROLE_ADMIN" })
     @PostMapping("/cancel/{ticketId}")
-    public String cancelBooking(@PathVariable Integer ticketId) {
+    public String cancelTicket(
+            @PathVariable Integer ticketId,
+            @RequestParam(required = false) Long flightId,
+            @AuthenticationPrincipal UserDetails userDetails,
+            RedirectAttributes attrs
+    ) {
         ticketService.cancelTicket(ticketId);
-        return "redirect:/bookings";
+        attrs.addFlashAttribute("successMessage", "Ticket #" + ticketId + " cancelled.");
+
+        boolean isOpOrAdmin = userDetails.getAuthorities().contains(
+                new SimpleGrantedAuthority("ROLE_OPERATOR")) ||
+                userDetails.getAuthorities().contains(
+                        new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+        if (isOpOrAdmin && flightId != null) {
+            return "redirect:/admin/flights/" + flightId + "/manifest";
+        }
+
+        String username = userDetails.getUsername();
+        return "redirect:/tickets/passenger/" + username;
     }
+
+    @Secured({ "ROLE_OPERATOR","ROLE_ADMIN" })
+    @GetMapping("/edit/{id}")
+    public String editTicketForm(@PathVariable Integer id, Model model) {
+        TicketResponseDto t = ticketService.getTicketById(id);
+        model.addAttribute("ticket", t);
+        model.addAttribute("classes", TicketClass.values());
+        return "ticket-edit-form";
+    }
+
+    @Secured({ "ROLE_OPERATOR","ROLE_ADMIN" })
+    @PostMapping("/edit/{id}")
+    public String updateTicket(
+            @PathVariable Integer id,
+            @RequestParam TicketClass ticketClass,
+            @RequestParam String seatNumber,
+            @RequestParam Long flightId
+    ) {
+        ticketService.updateTicket(id, ticketClass, seatNumber, flightId);
+        return "redirect:/admin/flights/" + flightId + "/manifest";
+    }
+
+    @Secured({ "ROLE_CUSTOMER","ROLE_OPERATOR","ROLE_ADMIN" })
+    @GetMapping("/passenger/{username}")
+    public String listPassengerBookings(
+            @PathVariable String username,
+            @AuthenticationPrincipal UserDetails userDetails,
+            Authentication auth,
+            Model model
+    ) {
+
+        boolean isSelf = userDetails.getUsername().equals(username);
+        boolean isPrivileged = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_OPERATOR")
+                        || a.getAuthority().equals("ROLE_ADMIN"));
+        if (!isSelf && !isPrivileged) {
+            return "error/403";  // or your “access denied” page
+        }
+
+        UserResponseDto customer = userService.getUserByUsername(username);
+        model.addAttribute("customer", customer);
+        model.addAttribute("bookings",
+                ticketService.getTicketsForPassenger(customer.getId()));
+        return "booking-history";
+    }
+
 }

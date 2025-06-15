@@ -36,18 +36,18 @@ public class FlightServiceImpl implements FlightService {
     @Transactional
     public FlightResponseDto scheduleFlight(FlightRequestDto dto) {
 
-        // 1) Lookup airplane
+//        Lookup airplane
         Airplane plane = airplaneRepo.findById(dto.getAirplaneId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid airplane ID: " + dto.getAirplaneId()));
 
-        // 2) Lookup departure/arrival airports by code
+//        Lookup departure/arrival airports by code
         Airport depAirport = airportRepo.findByCode(dto.getDepartureAirportCode().toUpperCase())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid departure airport code: " + dto.getDepartureAirportCode()));
 
         Airport arrAirport = airportRepo.findByCode(dto.getArrivalAirportCode().toUpperCase())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid arrival airport code: " + dto.getArrivalAirportCode()));
 
-        // 3) Check plane is stationed and no overlap (same as before)…
+//        Check plane is stationed and no overlap (same as before)…
         if (!plane.getHomeAirport().getId().equals(depAirport.getId())) {
             throw new IllegalStateException("Airplane not at departure airport");
         }
@@ -57,7 +57,6 @@ public class FlightServiceImpl implements FlightService {
             throw new IllegalStateException("Overlapping flight for this airplane");
         }
 
-        // 4) Map DTO → entity
         Flight flight = new Flight();
         flight.setAirplane(plane);
         flight.setDepartureAirport(depAirport);
@@ -70,7 +69,6 @@ public class FlightServiceImpl implements FlightService {
 
         Flight saved = flightRepo.save(flight);
 
-        // 5) Map entity → response DTO
         return mapToDto(saved);
     }
 
@@ -98,25 +96,29 @@ public class FlightServiceImpl implements FlightService {
                                                    String destCode,
                                                    LocalDateTime start,
                                                    LocalDateTime end) {
-        // fetch all possible first legs
-        List<FlightResponseDto> firstLegs =
-                searchDirect(originCode, null, start, end);
 
-        // fetch all possible second legs
-        List<FlightResponseDto> secondLegs =
-                searchDirect(null, destCode, start, end);
+//        fetch all possible first legs (all departures from the origin airport)
+        List<FlightResponseDto> firstLegs = getDepartures(originCode, start, end);
 
-        long minLayover = Duration.ofHours(1).toMinutes();   // ≥1h
-        long maxLayover = Duration.ofHours(6).toMinutes();   // ≤6h
+//        fetch all possible second legs (all arrivals to the destination airport)
+        List<FlightResponseDto> secondLegs = getArrivals(destCode, start, end);
+
+        long minLayover = Duration.ofHours(1).toMinutes();   // >= 1h
+        long maxLayover = Duration.ofHours(6).toMinutes();   // <= 6h
 
         List<TransitFlightOption> results = new ArrayList<>();
         for (FlightResponseDto f1 : firstLegs) {
             for (FlightResponseDto f2 : secondLegs) {
-                // must connect at same airport
+//                must connect at same airport
                 if (!f1.getArrivalAirportCode().equals(f2.getDepartureAirportCode())) {
                     continue;
                 }
-                // compute layover
+//                The second leg must depart after the first leg arrives
+                if (!f2.getDepartureTime().isAfter(f1.getArrivalTime())) {
+                    continue;
+                }
+
+//                compute layover
                 long layover = Duration.between(
                                 f1.getArrivalTime(),
                                 f2.getDepartureTime())

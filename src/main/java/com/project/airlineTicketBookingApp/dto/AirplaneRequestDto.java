@@ -21,7 +21,8 @@ public class AirplaneRequestDto {
     @NotBlank
     private String model;
 
+//    To identify where the airplane current is located
     @NotNull
-    private Long homeAirportId;  // reference to an existing Airport
+    private Long homeAirportId;
 
 }

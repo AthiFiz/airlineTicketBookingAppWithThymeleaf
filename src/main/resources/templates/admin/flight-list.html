@@ -19,8 +19,6 @@
             <td th:text="${f.airplaneTailNumber}"></td>
             <td th:text="${f.departureAirportCode}"></td>
             <td th:text="${f.arrivalAirportCode}"></td>
-<!--            <td th:text="${#dates.format(f.departureTime,'yyyy-MM-dd HH:mm')}"></td>-->
-<!--            <td th:text="${#dates.format(f.arrivalTime,'yyyy-MM-dd HH:mm')}"></td>-->
             <td th:text="${#temporals.format(f.departureTime,'HH:mm')}"></td>
             <td th:text="${#temporals.format(f.arrivalTime,'HH:mm')}"></td>
             <td>

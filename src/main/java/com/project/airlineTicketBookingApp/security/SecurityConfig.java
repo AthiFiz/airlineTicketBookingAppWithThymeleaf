@@ -21,34 +21,33 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // DelegatingPasswordEncoder that supports {noop}, {bcrypt}, etc.
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // Disable CSRF for H2 console
+//                Disable CSRF for H2 console
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/h2-console/**")
                 )
-                // Allow frames from same origin (H2 console uses frames)
+//                Allow frames from same origin (H2 console uses frames)
                 .headers(headers -> headers
                         .frameOptions(frame -> frame.sameOrigin())
                 )
                 .authorizeHttpRequests(auth -> auth
-                        // public
+//                        public
                         .requestMatchers("/", "/login", "/flights/search", "/flights/search/**",
                                 "/flights/search/transit", "/css/**", "/js/**").permitAll()
-                        // booking form (UI) requires login
+//                        booking form (UI) requires login
                         .requestMatchers("/flights/book").authenticated()
-                        // booking action requires CUSTOMER or OPERATOR
+//                        booking action requires CUSTOMER or OPERATOR
                         .requestMatchers("/tickets/book").hasAnyAuthority("ROLE_CUSTOMER", "ROLE_OPERATOR", "ROLE_ADMIN")
-                        // reports
+//                        reports
                         .requestMatchers("/reports/**").hasAnyAuthority("ROLE_OPERATOR","ROLE_ADMIN")
-                        // admin UI
+//                        admin UI
                         .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-                        // any other request requires auth
+//                        any other request requires auth
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -61,7 +60,7 @@ public class SecurityConfig {
                         .permitAll()
                 );
 
-        // Register our custom UserDetailsService
+        // Register custom UserDetailsService
         http.userDetailsService(uds);
 
         return http.build();

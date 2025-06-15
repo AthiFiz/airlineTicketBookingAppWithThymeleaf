@@ -16,7 +16,6 @@ public interface UserService {
     List<UserResponseDto> getAllUsers();
     UserResponseDto getUserByUsername(String username);
     UserResponseDto deactivateUser(Long id);
-//    UserResponseDto updateUser(Long id, UserRequestDto dto, BindingResult bindingResult, Model model);
     UserResponseDto updateUser(Long id, UserRequestDto dto);
     void activateUser(Long id);
 }

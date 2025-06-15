@@ -41,7 +41,6 @@ public class AdminUserController {
             BindingResult binding,
             Model model
     ) {
-        // ensure form sees these
         model.addAttribute("editMode", false);
 
         if (binding.hasErrors()) {
@@ -51,7 +50,6 @@ public class AdminUserController {
         return "redirect:/admin/users";
     }
 
-    /** Show the “edit user” form */
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model) {
         UserResponseDto existing = userService.getUserById(id);
@@ -67,7 +65,6 @@ public class AdminUserController {
         return "admin/user-form";
     }
 
-    /** Handle edit submission */
     @PostMapping("/{id}")
     public String updateUser(
             @PathVariable Long id,
@@ -85,7 +82,6 @@ public class AdminUserController {
     }
 
 
-    /** Deactivate a user */
     @PostMapping("/deactivate/{id}")
     public String deactivateUser(@PathVariable Long id) {
         userService.deactivateUser(id);

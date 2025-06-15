@@ -29,15 +29,13 @@ public class TicketServiceImpl implements TicketService {
     @Transactional
     public TicketResponseDto bookTicket(Long flightId, Long passengerId, TicketClass ticketClass, String seatNumber) {
 
-        // 1) Validate flight exists
         Flight flight = flightRepo.findById(flightId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid flight ID"));
 
-        // 2) Validate passenger exists
         User passenger = userRepo.findById(passengerId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid passenger ID"));
 
-        // 3) Check seat availability by class
+//        Check seat availability for chosen class
         long alreadyBooked = ticketRepo.countByFlightIdAndTicketClass(
                 flightId, ticketClass);
 
@@ -50,6 +48,7 @@ public class TicketServiceImpl implements TicketService {
             case BUSINESS:
                 capacity = flight.getTotalBusinessClassSeats();
                 break;
+
             case ECONOMY:
                 capacity = flight.getTotalEconomyClassSeats();
                 break;
@@ -60,12 +59,10 @@ public class TicketServiceImpl implements TicketService {
             throw new IllegalStateException("No seats available in " + ticketClass);
         }
 
-        // 4) Check seatNumber uniqueness on this flight
         if (ticketRepo.existsByFlightIdAndSeatNumber(flightId, seatNumber)) {
             throw new IllegalStateException("Seat " + seatNumber + " is already taken");
         }
 
-        // 5) Create and save the ticket
         Ticket ticket = Ticket.builder()
                 .flight(flight)
                 .passenger(passenger)
@@ -75,7 +72,6 @@ public class TicketServiceImpl implements TicketService {
 
         Ticket saved = ticketRepo.save(ticket);
 
-        // 6) Map to DTO
         return new TicketResponseDto(
                 saved.getId(),
                 flight.getId(),
@@ -110,6 +106,20 @@ public class TicketServiceImpl implements TicketService {
     }
 
     @Override
+    public TicketResponseDto getTicketById(Integer ticketId) {
+        Ticket t = ticketRepo.findById(ticketId)
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found: " + ticketId));
+        return new TicketResponseDto(
+                t.getId(),
+                t.getFlight().getId(),
+                t.getFlight().getAirplane().getTailNumber(),
+                t.getPassenger().getId(),
+                t.getPassenger().getUsername(),
+                t.getTicketClass().name(),
+                t.getSeatNumber());
+    }
+
+    @Override
     public List<TicketResponseDto> getTicketsForPassenger(Long userId) {
 
         if (userRepo.findById(userId).isEmpty()) {
@@ -136,6 +146,31 @@ public class TicketServiceImpl implements TicketService {
                 .orElseThrow(() ->
                         new IllegalArgumentException("Ticket not found: " + ticketId));
         ticketRepo.delete(ticket);
+    }
+
+    @Override
+    public TicketResponseDto updateTicket(Integer ticketId,
+                                          TicketClass ticketClass,
+                                          String seatNumber,
+                                          Long flightId) {
+        Ticket ticket = ticketRepo.findById(ticketId)
+                .orElseThrow(() -> new IllegalArgumentException("Ticket not found: " + ticketId));
+
+        ticket.setTicketClass(ticketClass);
+        ticket.setSeatNumber(seatNumber);
+
+        ticketRepo.save(ticket);
+
+        return new TicketResponseDto(
+                ticket.getId(),
+                ticket.getFlight().getId(),
+                ticket.getFlight().getAirplane().getTailNumber(),
+                ticket.getPassenger().getId(),
+                ticket.getPassenger().getUsername(),
+                ticket.getTicketClass().name(),
+                ticket.getSeatNumber()
+                );
+
     }
 
 }

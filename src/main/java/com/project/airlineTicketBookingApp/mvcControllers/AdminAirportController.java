@@ -26,7 +26,7 @@ public class AdminAirportController {
         this.airportService = airportService;
     }
 
-    /** List all airports */
+//    List all airports
     @GetMapping
     public String list(Model model) {
         List<AirportResponseDto> all = airportService.getAllAirports();
@@ -34,7 +34,7 @@ public class AdminAirportController {
         return "admin/airport-list";
     }
 
-    /** Show form to add a new airport */
+//    Show form to add a new airport
     @GetMapping("/new")
     public String createForm(Model model) {
         model.addAttribute("airport", new AirportRequestDto());
@@ -42,7 +42,7 @@ public class AdminAirportController {
         return "admin/airport-form";
     }
 
-    /** Show form to edit an existing airport */
+//    Show form to edit an existing airport
     @GetMapping("/edit/{code}")
     public String editForm(@PathVariable String code, Model model) {
         AirportResponseDto dto = airportService.getAirportByCode(code);
@@ -56,7 +56,7 @@ public class AdminAirportController {
         return "admin/airport-form";
     }
 
-    /** Handle form submission for both create & update */
+//    Handle form submission for both create & update
     @PostMapping
     public String save(
             @ModelAttribute("airport") @Valid AirportRequestDto dto,
@@ -73,15 +73,13 @@ public class AdminAirportController {
         }
 
         if (editMode) {
-            // for update, you might implement an updateAirport() method
-            airportService.updateAirport(dto); // assuming create replaces on code
+            airportService.updateAirport(dto);
         } else {
             airportService.createAirport(dto);
         }
         return "redirect:/admin/airports";
     }
 
-    /** Delete an airport */
     @GetMapping("/delete/{code}")
     public String delete(@PathVariable String code) {
         airportService.deleteByCode(code);

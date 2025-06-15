@@ -29,10 +29,9 @@ public class BookingWebController {
     @GetMapping("/bookings")
     public String myBookings(@AuthenticationPrincipal UserDetails userDetails,
                              Model model) {
-        // Look up the current user to get their ID
+
         UserResponseDto user = userService.getUserByUsername(userDetails.getUsername());
 
-        // Fetch all tickets for that user
         List<TicketResponseDto> bookings =
             ticketService.getTicketsForPassenger(user.getId());
 
@@ -40,7 +39,6 @@ public class BookingWebController {
         return "booking-history";
     }
 
-    /** Cancel a booking and redirect back */
     @PostMapping("/bookings/cancel/{ticketId}")
     public String cancelBooking(@PathVariable Integer ticketId) {
         ticketService.cancelTicket(ticketId);

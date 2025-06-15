@@ -1,4 +1,3 @@
-// src/main/java/com/project/airlineTicketBookingApp/mvcControllers/AdminAirplaneController.java
 package com.project.airlineTicketBookingApp.mvcControllers;
 
 import com.project.airlineTicketBookingApp.dto.AirplaneRequestDto;
@@ -39,7 +38,6 @@ public class AdminAirplaneController {
 
     @GetMapping("/new")
     public String createForm(Model model) {
-        // ALWAYS include these four attributes
         model.addAttribute("airplaneDto", new AirplaneRequestDto());
         model.addAttribute("editMode", false);
         model.addAttribute("sizes", Arrays.asList(AircraftSize.values()));
@@ -90,7 +88,6 @@ public class AdminAirplaneController {
             BindingResult binding,
             Model model) {
 
-        // repopulate on errors
         model.addAttribute("airplaneDto", dto);
         model.addAttribute("editMode", true);
         model.addAttribute("airplaneId", id);

@@ -82,7 +82,6 @@ public class AdminFlightController {
         model.addAttribute("airports",  airportService.getAllAirports());
         model.addAttribute("editMode",   false);
 
-        // Validation errors?
         if (binding.hasErrors()) {
             return "admin/flight-form";
         }
@@ -91,7 +90,6 @@ public class AdminFlightController {
             flightService.scheduleFlight(dto);
             return "redirect:/admin/flights";
         } catch (IllegalStateException ex) {
-            // Business‐rule violation: show on form
             model.addAttribute("scheduleError", ex.getMessage());
             return "admin/flight-form";
         }
@@ -103,10 +101,8 @@ public class AdminFlightController {
         return "redirect:/admin/flights";
     }
 
-    /** Passenger manifest for flight {id} */
     @GetMapping("/{id}/manifest")
     public String manifest(@PathVariable Long id, Model model) {
-        // fetch all tickets for this flight
         List<TicketResponseDto> tickets =
                 ticketService.getTicketsForFlight(id);
 

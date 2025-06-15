@@ -1,9 +1,7 @@
 package com.project.airlineTicketBookingApp.dto;
 
-import com.project.airlineTicketBookingApp.model.Flight;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  *
